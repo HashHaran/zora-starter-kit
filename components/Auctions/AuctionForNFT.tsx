@@ -1,5 +1,5 @@
 import { useContractRead } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/1.json"
+import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
 import { abi } from "@zoralabs/v3/dist/artifacts/ReserveAuctionCoreEth.sol/ReserveAuctionCoreEth.json"
 //// ^ should be pointing to ReserveAuctionFindersEth but that doesnt work for some reason
 import { BigNumber, utils } from "ethers";
@@ -8,8 +8,7 @@ export const AuctionForNFT = (nft) => {
 
     // AsksV1_1 askForNFT read call
     const { data, isLoading, isSuccess, isFetching  } = useContractRead({
-        addressOrName: "0x9458e29713b98bf452ee9b2c099289f533a5f377",
-        // ^following inst working: mainnetZoraAddresses.ReserveAuctionFindersEth
+        addressOrName: mainnetZoraAddresses.ReserveAuctionFindersEth,
         contractInterface: abi,
         functionName: 'auctionForNFT',
         args: [

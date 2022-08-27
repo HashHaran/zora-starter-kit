@@ -1,9 +1,9 @@
 import { useContractWrite } from "wagmi";
 import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
-import { abi } from "@zoralabs/v3/dist/artifacts/OffersV1.sol/OffersV1.json"
+import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
 
-export const CancelOffer = (nft) => {
+export const CancelFlexiBarterOffer = (nft) => {
 
     interface cancelOfferCall {
         tokenContract: any,
@@ -20,7 +20,7 @@ export const CancelOffer = (nft) => {
     const offerTokenId = nft ? nft.nft.nft.tokenId : cancelOffer.tokenId
     const offerContractAddress = nft ? nft.nft.nft.contractAddress : cancelOffer.tokenContract
 
-    // OffersV1 camcelOffer call
+    // FlexiBarterOffersV1 cancelOffer call
 
     const { data: cancelOfferData, isError: cancelOfferError, isLoading: cancelOfferLoading, isSuccess: cancelOfferSuccess, write: cancelOfferWrite  } = useContractWrite({
         addressOrName: mainnetZoraAddresses.OffersV1,

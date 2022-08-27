@@ -1,5 +1,5 @@
 import { useContractRead } from "wagmi";
-import * as asksAddresses from "@zoralabs/v3/dist/addresses/1.json"
+import * as asksAddresses from "@zoralabs/v3/dist/addresses/4.json"
 import { abi } from "@zoralabs/v3/dist/artifacts/AsksV1_1.sol/AsksV1_1.json"
 import { BigNumber, utils } from "ethers";
 

@@ -4,13 +4,14 @@ import { abi } from "@zoralabs/v3/dist/artifacts/OffersV1.sol/OffersV1.json"
 import { useState, useEffect } from "react";
 import { BigNumber, utils } from "ethers";
 
-export const GetExistingOffers = (nft) => {
+export const GetExistingFlexiBarterOffers = (nft) => {
 
     const [offerId, setOfferId] = useState("0")
 
     // OffersV1 offerForNFT read call
-    const { data, isLoading, isSuccess, isFetching  } = useContractRead({
-        addressOrName: mainnetZoraAddresses.OffersV1,
+    const { data, isLoading, isSuccess, isFetching } = useContractRead({
+        //TODO: Change to Flexi Barter Offers Deployed address
+        addressOrName: "0x76744367AE5A056381868f716BDF0B13ae1aEaa3", //mainnetZoraAddresses.OffersV1,
         contractInterface: abi,
         functionName: 'offersForNFT',
         args: [
@@ -26,12 +27,13 @@ export const GetExistingOffers = (nft) => {
             console.log("success! --> ", data)
             console.log("data converted", BigNumber.from(data).toString())
             setOfferId(BigNumber.from(data).toString())
-        }  
+        }
     })
 
     // OffersV1 offers read call
-    const { data: offersData, isLoading: offersLoading, isSuccess: offersSuccess, isFetching: offersFetching  } = useContractRead({
-        addressOrName: mainnetZoraAddresses.OffersV1,
+    const { data: offersData, isLoading: offersLoading, isSuccess: offersSuccess, isFetching: offersFetching } = useContractRead({
+        //TODO: Change to Flexi Barter Offers Deployed address
+        addressOrName: "0x76744367AE5A056381868f716BDF0B13ae1aEaa3", //mainnetZoraAddresses.OffersV1,
         contractInterface: abi,
         functionName: 'offers',
         args: [
@@ -46,7 +48,7 @@ export const GetExistingOffers = (nft) => {
         onSuccess(data) {
             console.log("success! --> ", offersData)
             console.log("specific offer info", offersData)
-        }  
+        }
     })
 
     const offerMaker = offersData ? offersData.maker : "0x0000000000000000000000000000000000000000"
@@ -56,29 +58,35 @@ export const GetExistingOffers = (nft) => {
     const offersCheck = () => {
         if (offerMaker === "0x0000000000000000000000000000000000000000") {
             return (
-            <div>
-                No Active Listing for current Address + token id
-            </div>
+                <div>
+                    No Active Listing for current Address + token id
+                </div>
             )
         } else {
             return (
                 <div className="flex flex-row flex-wrap w-fit space-y-1">
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Contract Address: " + nft.nft.nft.contractAddress}
-                    </div>                
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    </div>
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Token Id: " + offersData[0]}
-                    </div>                
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    </div>
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Currency: " + offersData[1]}
                     </div>
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Finders Fee Bps: " + offersData[2]}
                     </div>
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Price: " + currentReadPrice}
                     </div>
-                    <div className="flex flex-row flex-wrap w-full">                    
+                    <div className="flex flex-row flex-wrap w-full">
+                        {"Offer NFT Contract Address: " + offersData[4]}
+                    </div>
+                    <div className="flex flex-row flex-wrap w-full">
+                        {"Offer NFT Token Id: " + offersData[5]}
+                    </div>
+                    <div className="flex flex-row flex-wrap w-full">
                         {"Offer Id: " + offerId}
                     </div>
                 </div>
@@ -88,7 +96,7 @@ export const GetExistingOffers = (nft) => {
 
     return (
         <div className=" text-white text-sm h-full flex flex-col flex-wrap items-center justify-center">
-            <main className=" w-full flex flex-row flex-wrap"> 
+            <main className=" w-full flex flex-row flex-wrap">
                 {offersCheck()}
             </main>
         </div>

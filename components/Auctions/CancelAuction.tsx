@@ -1,5 +1,5 @@
 import { useContractWrite } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/1.json"
+import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
 import { abi } from "@zoralabs/v3/dist/artifacts/ReserveAuctionFindersEth.sol/ReserveAuctionFindersEth.json"
 import { useState } from "react";
 

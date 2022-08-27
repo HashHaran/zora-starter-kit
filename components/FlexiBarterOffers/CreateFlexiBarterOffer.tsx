@@ -1,58 +1,58 @@
 import { useContractWrite } from "wagmi";
 import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
-import { abi } from "@zoralabs/v3/dist/artifacts/ReserveAuctionFindersEth.sol/ReserveAuctionFindersEth.json"
+import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
 import { ethers } from "ethers";
 
-export const CreateAuction = (nft) => {
+export const CreateFlexiBarterOffer = (nft) => {
 
-    // this file is integrated with the ReserveAuctionFindersEth module
-    // so no currency is specified (since it only works for ETH)
-
-    interface createAuctionCall {
+    interface createFlexiBarterOfferCall {
         tokenContract: any,
         tokenId: any,
-        duration: any,
-        reservePrice: any,
-        sellerFundsRecipient: any,
-        startTime: any,
+        currency: any, 
+        amount: any,
+        offerTokenContract: any,
+        offerTokenId: any,
         findersFeeBps: any
     }
-
-    const [createAuction, setCreateAuction] = useState<createAuctionCall>({
+    
+    const [createOffer, setCreateOffer] = useState<createFlexiBarterOfferCall>({
         "tokenContract": nft.nft.nft.contractAddress,
         "tokenId": nft.nft.nft.tokenId,
-        "duration": "",
-        "reservePrice": "",
-        "sellerFundsRecipient": "",
-        "startTime": "",
+        "currency": "0x0000000000000000000000000000000000000000",
+        "amount": "",
+        "offerTokenContract": "",
+        "offerTokenId": "",
         "findersFeeBps": ""
     })
 
-    const auctionContractAddress = nft ? nft.nft.nft.contractAddress : createAuction.tokenContract    
-    const auctionTokenId = nft ? nft.nft.nft.tokenId : createAuction.tokenId    
+    const offerTokenId = nft ? nft.nft.nft.tokenId : createOffer.tokenId
+    const offerContractAddress = nft ? nft.nft.nft.contractAddress : createOffer.tokenContract
 
-    // ReserveAuctionFindersEth createAuction call
-    const reservePrice = createAuction.reservePrice ? ethers.utils.parseEther(createAuction.reservePrice) : ""
+    // FlexiBarterOffersV1OffersV1 createOffer call
+    const offerPrice = createOffer.amount ? ethers.utils.parseEther(createOffer.amount) : ""
 
-    const { data: createAuctionData, isError: createAuctionError, isLoading: createAuctionLoading, isSuccess: createAuctionSuccess, write: createAuctionWrite  } = useContractWrite({
-        addressOrName: mainnetZoraAddresses.ReserveAuctionFindersEth,
+    const { data: createOfferData, isError: createOfferError, isLoading: createOfferLoading, isSuccess: createOfferSuccess, write: createOfferWrite  } = useContractWrite({
+        addressOrName: mainnetZoraAddresses.OffersV1,
         contractInterface: abi,
-        functionName: 'createAuction',
+        functionName: 'createOffer',
         args: [
-            auctionContractAddress,
-            auctionTokenId,
-            createAuction.duration,
-            reservePrice,
-            createAuction.sellerFundsRecipient,
-            createAuction.startTime,
-            createAuction.findersFeeBps
+            offerContractAddress,
+            offerTokenId,
+            createOffer.offerTokenContract,
+            createOffer.offerTokenId,
+            createOffer.currency,
+            offerPrice,
+            createOffer.findersFeeBps
         ],
+        overrides: {
+            value: offerPrice
+        },
         onError(error, variables, context) {
             console.log("error", error)
         },
-        onSuccess(createAuctionData, variables, context) {
-            console.log("Success!", createAuctionData)
+        onSuccess(createOfferData, variables, context) {
+            console.log("Success!", createOfferData)
         },
     })
 
@@ -70,63 +70,21 @@ export const CreateAuction = (nft) => {
                 <div className="ml-5 flex flex-row flex-wrap w-fit">                    
                     {"Token Id: " + nft.nft.nft.tokenId}
                 </div>                                       
-            </div>                
-
-            <div className="flex flex-row w-full">
+            </div>  
+            
+            <div className="flex flex-row w-full">                
                 <input
                     className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
-                    placeholder="Auction Duration"
-                    name="createAuctionDuration"
-                    type="number"
-                    value={createAuction.duration}
-                    onChange={(e) => {
-                        e.preventDefault();
-                        setCreateAuction(current => {
-                            return {
-                            ...current,
-                            duration: e.target.value
-                            }
-                        })
-                    }}
-                    required                              
-                >
-                </input>
-            </div>      
-
-            <div className="flex flex-row w-full">
-                <input
-                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
-                    placeholder="Reserve Price (ETH)"
-                    name="createAuctionReservePrice"
-                    type="number"
-                    value={createAuction.reservePrice}
-                    onChange={(e) => {
-                        e.preventDefault();
-                        setCreateAuction(current => {
-                            return {
-                            ...current,
-                            reservePrice: e.target.value
-                            }
-                        })
-                    }}
-                    required                              
-                >
-                </input>
-            </div>
-
-            <div className="flex flex-row w-full">
-                <input
-                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
-                    placeholder="Seller Funds Recipient (address)"
-                    name="createAuctionSellerFundsRecipient"
+                    placeholder="Offer Contract Address"
+                    name="createOfferContracrAddress"
                     type="text"
-                    value={createAuction.sellerFundsRecipient}
+                    value={createOffer.offerTokenContract}
                     onChange={(e) => {
                         e.preventDefault();
-                        setCreateAuction(current => {
+                        setCreateOffer(current => {
                             return {
                             ...current,
-                            sellerFundsRecipient: e.target.value
+                            offerTokenContract: e.target.value
                             }
                         })
                     }}
@@ -135,37 +93,79 @@ export const CreateAuction = (nft) => {
                 </input>
             </div>
 
+            <div className="flex flex-row w-full">                      
+                <input
+                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
+                    placeholder="Offer Token Id"
+                    name="createOfferTokenId"
+                    type="number"
+                    value={createOffer.offerTokenId}
+                    onChange={(e) => {
+                        e.preventDefault();
+                        setCreateOffer(current => {
+                            return {
+                            ...current,
+                            offerTokenId: e.target.value
+                            }
+                        })
+                    }}
+                    required                              
+                >
+                </input>     
+            </div> 
+
             <div className="flex flex-row w-full">
                 <input
                     className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
-                    placeholder="Start Time (unix)"
-                    name="createAuctionStartTime"
+                    placeholder="Offer Price (ETH)"
+                    name="createOfferPrice"
                     type="number"
-                    value={createAuction.startTime}
+                    value={createOffer.amount}
                     onChange={(e) => {
                         e.preventDefault();
-                        setCreateAuction(current => {
+                        setCreateOffer(current => {
                             return {
                             ...current,
-                            startTime: e.target.value
+                            amount: e.target.value
                             }
                         })
                     }}
                     required                              
                 >
                 </input>
-            </div>                
+            </div>                     
+            
+            <div className="flex flex-row w-full">                
+                <input
+                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
+                    placeholder="Offer Currency"
+                    name="createOfferCurrency"
+                    type="text"
+                    value={createOffer.currency}
+                    onChange={(e) => {
+                        e.preventDefault();
+                        setCreateOffer(current => {
+                            return {
+                            ...current,
+                            currency: e.target.value
+                            }
+                        })
+                    }}
+                    required                              
+                >
+                </input>
+            </div>
 
-            <div className="flex flex-row w-full">
+            <div className="flex flex-row w-full">                      
                 <input
                     className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
                     placeholder="Finders Fee Bps"
-                    name="createAuctionFindersFeeBps"
+                    name="createOfferFindersFeeBps"
                     type="number"
-                    value={createAuction.findersFeeBps}
+                    value={createOffer.findersFeeBps}
                     onChange={(e) => {
                         e.preventDefault();
-                        setCreateAuction(current => {
+                        setCreateOffer(current => {
                             return {
                             ...current,
                             findersFeeBps: e.target.value
@@ -174,15 +174,14 @@ export const CreateAuction = (nft) => {
                     }}
                     required                              
                 >
-                </input>
-            </div>                                                                             
-        
+                </input>     
+            </div>               
             <button 
                 type="button"
-                onClick={() => createAuctionWrite()}
+                onClick={() => createOfferWrite()}
                 className="border-2 border-white border-solid w-full px-2 hover:bg-[#33FF57] hover:text-slate-900"
             >
-                CREATE AUCTION
+                CREATE OFFER
             </button>
         </div>
     )

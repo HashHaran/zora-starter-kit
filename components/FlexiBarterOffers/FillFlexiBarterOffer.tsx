@@ -1,15 +1,17 @@
 import { useContractWrite } from "wagmi";
 import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
-import { abi } from "@zoralabs/v3/dist/artifacts/OffersV1.sol/OffersV1.json"
+import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
 import { ethers } from "ethers";
 
-export const FillOffer = (nft) => {
+export const FillFlexiBarterOffer = (nft) => {
 
     interface fillOfferCall {
         tokenContract: any,
         tokenId: any,
         offerId: any,
+        offerTokenContract: any,
+        offerTokenId: any,
         currency: any, 
         amount: any,
         finder: any
@@ -19,6 +21,8 @@ export const FillOffer = (nft) => {
         "tokenContract": nft.nft.nft.contractAddress,
         "tokenId": nft.nft.nft.tokenId,
         "offerId": "",
+        "offerTokenContract": "",
+        "offerTokenId": "",
         "currency": "0x0000000000000000000000000000000000000000",
         "amount": "",
         "finder": "0x0000000000000000000000000000000000000000"
@@ -27,7 +31,7 @@ export const FillOffer = (nft) => {
     const offerTokenId = nft ? nft.nft.nft.tokenId : fillOffer.tokenId
     const offerContractAddress = nft ? nft.nft.nft.contractAddress : fillOffer.tokenContract
 
-    // OffersV1 fillOfferAmount call
+    // FlexiBarterOffersV1 fillOfferAmount call
     const offerPrice = fillOffer.amount ? ethers.utils.parseEther(fillOffer.amount) : ""
 
     const { data: fillOfferData, isError: fillOfferError, isLoading: fillOfferLoading, isSuccess: fillOfferSuccess, write: fillOfferWrite  } = useContractWrite({
@@ -38,6 +42,8 @@ export const FillOffer = (nft) => {
             offerContractAddress,
             offerTokenId,
             fillOffer.offerId,
+            fillOffer.offerTokenContract,
+            fillOffer.offerTokenId,
             fillOffer.currency,
             offerPrice,
             fillOffer.finder
@@ -85,7 +91,49 @@ export const FillOffer = (nft) => {
                     required                              
                 >
                 </input>     
-            </div>                                             
+            </div>    
+            
+            <div className="flex flex-row w-full">                
+                <input
+                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
+                    placeholder="Offer Token Contract"
+                    name="fillOfferTokenContract"
+                    type="text"
+                    value={fillOffer.offerTokenContract}
+                    onChange={(e) => {
+                        e.preventDefault();
+                        setFillOffer(current => {
+                            return {
+                            ...current,
+                            offerTokenContract: e.target.value
+                            }
+                        })
+                    }}
+                    required                              
+                >
+                </input>
+            </div>
+
+            <div className="flex flex-row w-full">                      
+                <input
+                    className="flex flex-row flex-wrap w-full text-black text-center bg-slate-200 hover:bg-slate-300"
+                    placeholder="Offer Token Id"
+                    name="fillOfferTokenId"
+                    type="number"
+                    value={fillOffer.offerTokenId}
+                    onChange={(e) => {
+                        e.preventDefault();
+                        setFillOffer(current => {
+                            return {
+                            ...current,
+                            offerTokenId: e.target.value
+                            }
+                        })
+                    }}
+                    required                              
+                >
+                </input>     
+            </div> 
             
             <div className="flex flex-row w-full">                
                 <input

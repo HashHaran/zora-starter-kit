@@ -1,5 +1,5 @@
 import { useContractWrite } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
+import * as mainnetZoraAddresses from "../../addresses/4.json"
 import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
 
@@ -23,7 +23,7 @@ export const CancelFlexiBarterOffer = (nft) => {
     // FlexiBarterOffersV1 cancelOffer call
 
     const { data: cancelOfferData, isError: cancelOfferError, isLoading: cancelOfferLoading, isSuccess: cancelOfferSuccess, write: cancelOfferWrite  } = useContractWrite({
-        addressOrName: mainnetZoraAddresses.OffersV1,
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
         contractInterface: abi,
         functionName: 'cancelOffer',
         args: [

@@ -3,8 +3,9 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
 import { NFTPreview, MediaConfiguration } from '@zoralabs/nft-components';
-import { Networks, Strategies } from "@zoralabs/nft-hooks"
-import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
+import { Networks, Strategies } from "@zoralabs/nft-hooks";
+import mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json";
+import deployedZoraAddresses from "../addresses/4.json";
 import zmmABI from "@zoralabs/v3/dist/artifacts/ZoraModuleManager.sol/ZoraModuleManager.json"
 import erc721abi from 'erc-token-abis/abis/ERC721Full.json'
 import { erc721ABI, useAccount, useContractRead, useContractWrite } from 'wagmi'
@@ -52,8 +53,8 @@ const Protocol: NextPage = () => {
   })
 
   const [offersNFT, setOffersNFT] = useState<nftInfo>({
-    "contractAddress": "0x7e6663E45Ae5689b313e6498D22B041f4283c88A",
-    "tokenId": "2"
+    "contractAddress": "0x10bdfB0BC2Fd63Ec79B2EE2019c25Ee467a5f398",
+    "tokenId": "0"
   })
 
   const [auctionsNFT, setAuctionsNFT] = useState<nftInfo>({
@@ -154,7 +155,7 @@ const Protocol: NextPage = () => {
     functionName: 'isApprovedForAll',
     args: [
       currentUserAddress, //owner
-      mainnetZoraAddresses.ERC721TransferHelper // transferhelper
+      deployedZoraAddresses.ERC721TransferHelper // transferhelper
     ],
     watch: false,
     onError(error) {
@@ -171,11 +172,11 @@ const Protocol: NextPage = () => {
 
   // OFFERS: Apporve ERC721TransferHelper as an operator of the specific NFT
   const { data: offersTransferHelperData, isError: offersTransferHelperError, isLoading: offersTransferHelperLoading, isSuccess: offersTransferHelperSuccess, write: offersTransferHelperWrite } = useContractWrite({
-    addressOrName: asksNFT.contractAddress,
+    addressOrName: offersNFT.contractAddress,
     contractInterface: erc721ABI,
     functionName: 'setApprovalForAll',
     args: [
-      mainnetZoraAddresses.ERC721TransferHelper,
+      deployedZoraAddresses.ERC721TransferHelper,
       true,
     ],
     onError(error, variables, context) {
@@ -188,12 +189,12 @@ const Protocol: NextPage = () => {
 
   // check if owner has approved OffersV1 Module
   const { data: zmmOffersBool, isLoading: zmmOffersLoading, isSuccess: zmmOffersSuccess, isFetching: zmmOffersFetching } = useContractRead({
-    addressOrName: mainnetZoraAddresses.ZoraModuleManager,
+    addressOrName: deployedZoraAddresses.ZoraModuleManager,
     contractInterface: zmmABI.abi,
     functionName: 'isModuleApproved',
     args: [
       currentUserAddress, //owner
-      mainnetZoraAddresses.OffersV1 // OffersV1 address
+      deployedZoraAddresses.FlexiBarterOffersV1 // OffersV1 address
     ],
     watch: false,
     onError(error) {
@@ -210,11 +211,11 @@ const Protocol: NextPage = () => {
 
   // offers: approve FLEXI BARTER OFFERS MODULE
   const { data: offersZMMApproval, isError: offersZMMErrror, isLoading: offersZMMLoading, isSuccess: offersZMMSuccess, write: offersZMMWrite } = useContractWrite({
-    addressOrName: mainnetZoraAddresses.ZoraModuleManager,
+    addressOrName: deployedZoraAddresses.ZoraModuleManager,
     contractInterface: zmmABI.abi,
     functionName: 'setApprovalForModule',
     args: [
-      mainnetZoraAddresses.OffersV1,
+      deployedZoraAddresses.FlexiBarterOffersV1,
       true,
     ],
     onError(error, variables, context) {

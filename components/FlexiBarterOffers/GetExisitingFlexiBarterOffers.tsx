@@ -1,6 +1,6 @@
 import { useContractRead } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
-import { abi } from "@zoralabs/v3/dist/artifacts/OffersV1.sol/OffersV1.json"
+import * as mainnetZoraAddresses from "../../addresses/4.json"
+import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState, useEffect } from "react";
 import { BigNumber, utils } from "ethers";
 
@@ -11,13 +11,13 @@ export const GetExistingFlexiBarterOffers = (nft) => {
     // OffersV1 offerForNFT read call
     const { data, isLoading, isSuccess, isFetching } = useContractRead({
         //TODO: Change to Flexi Barter Offers Deployed address
-        addressOrName: "0x76744367AE5A056381868f716BDF0B13ae1aEaa3", //mainnetZoraAddresses.OffersV1,
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
         contractInterface: abi,
         functionName: 'offersForNFT',
         args: [
             nft.nft.nft.contractAddress,
             nft.nft.nft.tokenId,
-            0 //hardcoded always looking for first offer
+            1 //hardcoded always looking for first offer
         ],
         watch: true,
         onError(error) {
@@ -33,7 +33,7 @@ export const GetExistingFlexiBarterOffers = (nft) => {
     // OffersV1 offers read call
     const { data: offersData, isLoading: offersLoading, isSuccess: offersSuccess, isFetching: offersFetching } = useContractRead({
         //TODO: Change to Flexi Barter Offers Deployed address
-        addressOrName: "0x76744367AE5A056381868f716BDF0B13ae1aEaa3", //mainnetZoraAddresses.OffersV1,
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
         contractInterface: abi,
         functionName: 'offers',
         args: [
@@ -54,6 +54,7 @@ export const GetExistingFlexiBarterOffers = (nft) => {
     const offerMaker = offersData ? offersData.maker : "0x0000000000000000000000000000000000000000"
     const currentReadData = offersData ? offersData : ""
     const currentReadPrice = offersData ? `${utils.formatEther(BigNumber.from(currentReadData[3]).toString())}` + " ETH" : "undefined"
+    const offeredNftTokenId = offersData ? BigNumber.from(currentReadData[5]).toString(): "undefined"
 
     const offersCheck = () => {
         if (offerMaker === "0x0000000000000000000000000000000000000000") {
@@ -69,7 +70,7 @@ export const GetExistingFlexiBarterOffers = (nft) => {
                         {"Contract Address: " + nft.nft.nft.contractAddress}
                     </div>
                     <div className="flex flex-row flex-wrap w-full">
-                        {"Token Id: " + offersData[0]}
+                        {"Token Id: " + nft.nft.nft.tokenId}
                     </div>
                     <div className="flex flex-row flex-wrap w-full">
                         {"Currency: " + offersData[1]}
@@ -84,7 +85,7 @@ export const GetExistingFlexiBarterOffers = (nft) => {
                         {"Offer NFT Contract Address: " + offersData[4]}
                     </div>
                     <div className="flex flex-row flex-wrap w-full">
-                        {"Offer NFT Token Id: " + offersData[5]}
+                        {"Offer NFT Token Id: " + offeredNftTokenId}
                     </div>
                     <div className="flex flex-row flex-wrap w-full">
                         {"Offer Id: " + offerId}

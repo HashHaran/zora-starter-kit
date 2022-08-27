@@ -1,5 +1,5 @@
 import { useContractWrite } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
+import * as mainnetZoraAddresses from "../../addresses/4.json"
 import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
 import { ethers } from "ethers";
@@ -35,7 +35,7 @@ export const FillFlexiBarterOffer = (nft) => {
     const offerPrice = fillOffer.amount ? ethers.utils.parseEther(fillOffer.amount) : ""
 
     const { data: fillOfferData, isError: fillOfferError, isLoading: fillOfferLoading, isSuccess: fillOfferSuccess, write: fillOfferWrite  } = useContractWrite({
-        addressOrName: mainnetZoraAddresses.OffersV1,
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
         contractInterface: abi,
         functionName: 'fillOffer',
         args: [

@@ -1,8 +1,8 @@
-import { useContractWrite } from "wagmi";
-import * as mainnetZoraAddresses from "@zoralabs/v3/dist/addresses/4.json"
+import { useContractRead, useContractWrite } from "wagmi";
+import * as mainnetZoraAddresses from "../../addresses/4.json"
 import { abi } from "../../abi/FlexiBarterOffersV1.sol/FlexiBarterOffersV1.json"
 import { useState } from "react";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 export const UpdateFlexiBarterOffer = (nft) => {
 
@@ -15,11 +15,13 @@ export const UpdateFlexiBarterOffer = (nft) => {
         currency: any, 
         amount: any,
     }
+
+    const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
     
     const [updateOffer, setupdateOffer] = useState<updateOfferCall>({
         "tokenContract": nft.nft.nft.contractAddress,
         "tokenId": nft.nft.nft.tokenId,
-        "offerId": "",
+        "offerId": "0",
         "offerTokenContract": "",
         "offerTokenId": "",
         "currency": "0x0000000000000000000000000000000000000000",
@@ -30,10 +32,45 @@ export const UpdateFlexiBarterOffer = (nft) => {
     const offerContractAddress = nft ? nft.nft.nft.contractAddress : updateOffer.tokenContract
 
     // FlexiBarterOffersV1 updateOfferAmount call
-    const offerPrice = updateOffer.amount ? ethers.utils.parseEther(updateOffer.amount) : ""
+
+    // OffersV1 offers read call
+    const { data: offersData, isLoading: offersLoading, isSuccess: offersSuccess, isFetching: offersFetching } = useContractRead({
+        //TODO: Change to Flexi Barter Offers Deployed address
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
+        contractInterface: abi,
+        functionName: 'offers',
+        args: [
+            nft.nft.nft.contractAddress,
+            nft.nft.nft.tokenId,
+            updateOffer.offerId
+        ],
+        watch: true,
+        onError(error) {
+            console.log("error: ", error)
+        },
+        onSuccess(data) {
+            console.log("success! --> ", offersData)
+            console.log("specific offer info", offersData)
+        }
+    })
+
+    const currentReadData = offersData ? offersData : ""
+    let existingOffer, ethValueToSend;
+    if (currentReadData[1] === ZERO_ADDRESS) {
+        existingOffer = ethers.utils.formatEther(BigNumber.from(currentReadData[3]).toNumber())
+        console.log(`Existing offer: ${existingOffer}`)
+        console.log(`Update offer amount: ${updateOffer.amount}`)
+        const differenceToBePaid = updateOffer.amount - existingOffer
+        console.log(`Difference to be paid ${differenceToBePaid}`)
+        ethValueToSend = updateOffer.amount ? ethers.utils.parseEther((differenceToBePaid < 0? 0: differenceToBePaid).toString()) : ""
+    } else {
+        ethValueToSend = updateOffer.amount ? ethers.utils.parseEther("0") : ""
+    }
+        
+    const offerPrice = updateOffer.amount ? ethers.utils.parseEther((updateOffer.amount).toString()) : ""
 
     const { data: updateOfferData, isError: updateOfferError, isLoading: updateOfferLoading, isSuccess: updateOfferSuccess, write: updateOfferWrite  } = useContractWrite({
-        addressOrName: mainnetZoraAddresses.OffersV1,
+        addressOrName: mainnetZoraAddresses.FlexiBarterOffersV1,
         contractInterface: abi,
         functionName: 'updateOffer',
         args: [
@@ -46,7 +83,7 @@ export const UpdateFlexiBarterOffer = (nft) => {
             offerPrice,
         ],
         overrides: {
-            value: offerPrice
+            value: ethValueToSend
         },
         onError(error, variables, context) {
             console.log("error", error)
